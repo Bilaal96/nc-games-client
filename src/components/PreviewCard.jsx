@@ -4,10 +4,13 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Chip,
   Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import StyledChip from './StyledChip';
+
+// Utils
+import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
 
 const PreviewCard = ({
   category,
@@ -19,16 +22,6 @@ const PreviewCard = ({
   title,
   votes,
 }) => {
-  const formattedCreatedAt = new Date(created_at).toLocaleDateString(
-    undefined,
-    {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }
-  );
-
   return (
     <CardActionArea component={Link} to={`/reviews/${review_id}`}>
       <Card sx={{ height: 400 }} elevation={4}>
@@ -44,15 +37,10 @@ const PreviewCard = ({
         <CardContent sx={{ position: 'relative', height: 260 }}>
           {/* Card Main */}
           <Box>
-            <Chip
+            <StyledChip
               label={category}
               variant="outlined"
-              sx={(theme) => ({
-                height: '1.5rem',
-                backgroundColor: '#e4c5ea',
-                borderColor: 'secondary.light',
-                mb: theme.spacing(1),
-              })}
+              sx={(theme) => ({ mb: theme.spacing(1) })}
             />
             <Typography
               component="h3"
@@ -82,7 +70,7 @@ const PreviewCard = ({
               <strong>{votes}</strong> Votes
             </Typography>
             <Typography sx={{ fontSize: '0.875rem', color: 'grey' }}>
-              <em>{formattedCreatedAt}</em>
+              <em>{getDateStringFromTimestamp(created_at)}</em>
             </Typography>
           </Box>
         </CardContent>
