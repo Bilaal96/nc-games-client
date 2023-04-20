@@ -4,10 +4,10 @@ import {
   CardActionArea,
   CardContent,
   CardMedia,
-  Chip,
   Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import StyledChip from './StyledChip';
 
 const PreviewCard = ({
   category,
@@ -44,15 +44,10 @@ const PreviewCard = ({
         <CardContent sx={{ position: 'relative', height: 260 }}>
           {/* Card Main */}
           <Box>
-            <Chip
+            <StyledChip
               label={category}
               variant="outlined"
-              sx={(theme) => ({
-                height: '1.5rem',
-                backgroundColor: '#e4c5ea',
-                borderColor: 'secondary.light',
-                mb: theme.spacing(1),
-              })}
+              sx={(theme) => ({ mb: theme.spacing(1) })}
             />
             <Typography
               component="h3"
