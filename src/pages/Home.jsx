@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import * as gamesApi from '../api';
 
@@ -18,7 +17,7 @@ const Home = () => {
     isFetching,
     error,
     data: reviews,
-  } = useQuery('reviews', gamesApi.fetchReviews, { refetchInterval });
+  } = useQuery('reviews', gamesApi.fetchAllReviews, { refetchInterval });
 
   if (isFetching) {
     return (
