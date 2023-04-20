@@ -12,7 +12,7 @@ function App() {
       <Navbar />
       <Toolbar />
 
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ my: 2 }}>
         <Routes>
           <Route path="/" element={<Navigate to="/reviews" replace={true} />} />
           <Route path="/reviews" element={<Home />} />
