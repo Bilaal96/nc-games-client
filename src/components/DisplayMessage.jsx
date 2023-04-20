@@ -1,6 +1,7 @@
 import { Alert, Box, Stack, Typography } from '@mui/material';
 
 const defaultMessage = 'Something went wrong. Please try again later.';
+
 const DisplayMessage = ({ error, message = defaultMessage }) => {
   return (
     <Stack direction="column" gap={2} minHeight="70vh">

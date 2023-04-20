@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import * as gamesApi from '../api';
 
 // Components
@@ -8,48 +9,35 @@ import DisplayMessage from '../components/DisplayMessage';
 import PageSpinner from '../components/PageSpinner';
 import PreviewCard from '../components/PreviewCard';
 
+// 15 minutes in milliseconds
+const refetchInterval = 60 * 1000 * 15;
+
 // Render Previews of Reviews
 const Home = () => {
-  const [reviews, setReviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    isFetching,
+    error,
+    data: reviews,
+  } = useQuery('reviews', gamesApi.fetchReviews, { refetchInterval });
 
-  useEffect(() => {
-    setError(null);
-    setIsLoading(true);
-
-    gamesApi
-      .fetchReviews()
-      .then((reviewsData) => {
-        console.log(reviewsData);
-        setReviews(reviewsData);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        const errorMessage =
-          err.response.data.message ||
-          'Something went wrong. Please try again later.';
-        setError(errorMessage);
-        setIsLoading(false);
-      });
-  }, []);
-
-  if (error)
-    return (
-      <PageWrapper heading="Reviews">
-        <DisplayMessage
-          error={error}
-          message="Something went wrong whilst fetching the reviews. Please try again later."
-        />
-      </PageWrapper>
-    );
-
-  if (isLoading)
+  if (isFetching) {
     return (
       <PageWrapper heading="Reviews">
         <PageSpinner />
       </PageWrapper>
     );
+  }
+
+  if (error) {
+    return (
+      <PageWrapper heading="Reviews">
+        <DisplayMessage
+          error={error.message}
+          message="Something went wrong whilst fetching the reviews. Please try again later."
+        />
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper heading="Reviews">
