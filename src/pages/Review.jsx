@@ -39,20 +39,6 @@ const Review = () => {
     );
   }
 
-  /* 
-    {
-      "review_id": 14,
-      "title": "Velit tempor ullamco amet ipsum dolor voluptate.",
-      "category": "hidden-roles",
-      "designer": "Don Keigh",
-      "owner": "cooljmessy",
-      "review_body": "Nostrud anim cupidatat incididunt officia cupidatat magna. Cillum commodo voluptate laboris id incididunt esse",
-      "review_img_url": "https://images.pexels.com/photos/8111357/pexels-photo-8111357.jpeg?w=700&h=700",
-      "created_at": "2021-02-05T11:27:26.563Z",
-      "votes": 3,
-      "comment_count": 0
-    }
-  */
   return (
     <PageWrapper heading="Review">
       <Grid container>
