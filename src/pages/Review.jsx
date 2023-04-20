@@ -108,9 +108,12 @@ const Review = () => {
                   </Typography>
                 </Stack>
               </Grid>
-            </Grid>
 
-            <Typography px={1}>{review.review_body}</Typography>
+              {/* Review Article */}
+              <Grid item md={8}>
+                <Typography px={1}>{review.review_body}</Typography>
+              </Grid>
+            </Grid>
 
             {/* Vote bar - upvote/downvote options */}
           </Stack>
