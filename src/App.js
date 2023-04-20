@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 
 // Pages
 import Home from './pages/Home';
+import Review from './pages/Review';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/reviews" replace={true} />} />
           <Route path="/reviews" element={<Home />} />
-          <Route path="/reviews/:review_id" element={<h1>Review</h1>} />
+          <Route path="/reviews/:review_id" element={<Review />} />
           <Route path="/auth" element={<h1>Auth</h1>} />
         </Routes>
       </Container>
