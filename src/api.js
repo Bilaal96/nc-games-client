@@ -8,6 +8,14 @@ export function fetchAllReviews() {
   return gamesApi.get('/reviews').then(({ data }) => data.reviews);
 }
 
-export function fetchReviewById(review_id) {
+export function fetchReviewById({ queryKey }) {
+  const review_id = queryKey[1];
   return gamesApi.get(`/reviews/${review_id}`).then(({ data }) => data.review);
+}
+
+export function fetchCommentsByReviewId({ queryKey }) {
+  const review_id = queryKey[1];
+  return gamesApi
+    .get(`/reviews/${review_id}/comments`)
+    .then(({ data }) => data.comments);
 }
