@@ -11,16 +11,36 @@ import StyledChip from '../components/StyledChip';
 
 // Utils
 import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
+import ReviewComments from '../components/ReviewComments';
+
+const ReviewSection = ({ children }) => {
+  return (
+    <Grid item xs={12}>
+      <Paper component="section" elevation={2} sx={{ p: 2 }}>
+        {children}
+      </Paper>
+    </Grid>
+  );
+};
 
 const Review = () => {
   const { review_id } = useParams();
   const {
-    isFetching,
-    error,
+    isFetching: fetchingReview,
+    error: errorReview,
     data: review,
-  } = useQuery('review', () => gamesApi.fetchReviewById(review_id));
+  } = useQuery(['review', review_id], gamesApi.fetchReviewById);
 
-  if (isFetching) {
+  // Dependent query - only executes if review was fetched successfully
+  const {
+    isFetching: fetchingComments,
+    error: errorComments,
+    data: comments,
+  } = useQuery(['comments', review_id], gamesApi.fetchCommentsByReviewId, {
+    enabled: !!review,
+  });
+
+  if (fetchingReview || fetchingComments) {
     return (
       <PageWrapper heading="Review">
         <PageSpinner />
@@ -28,12 +48,13 @@ const Review = () => {
     );
   }
 
+  const error = errorReview || errorComments;
   if (error) {
     return (
       <PageWrapper heading="Review">
         <DisplayMessage
           error={error.message}
-          message={`Something went wrong whilst fetching the review with ID: ${review_id}. Please try again later.`}
+          message={`Something went wrong whilst fetching data for review with ID: ${review_id}. Please try again later.`}
         />
       </PageWrapper>
     );
@@ -41,62 +62,67 @@ const Review = () => {
 
   return (
     <PageWrapper heading="Review">
-      <Grid container>
-        <Grid item xs={12}>
-          <Paper component="section" elevation={2} sx={{ p: 2 }}>
-            <Stack spacing={2}>
-              <Typography
-                component="h2"
-                color="primary"
-                sx={{
-                  typography: {
-                    xs: 'h5',
-                    md: 'h4',
-                  },
-                }}
-              >
-                {review.title}
-              </Typography>
+      <Grid container spacing={2}>
+        <ReviewSection>
+          <Stack spacing={2}>
+            <Typography
+              color="primary"
+              component="h2"
+              sx={{
+                typography: {
+                  xs: 'h5',
+                  md: 'h4',
+                },
+              }}
+            >
+              {review.title}
+            </Typography>
 
-              <StyledChip
-                label={review.category}
-                variant="outlined"
-                sx={{ width: 'max-content' }}
-              />
+            <StyledChip
+              label={review.category}
+              variant="outlined"
+              sx={{ width: 'max-content' }}
+            />
 
-              {/* Metadata */}
-              <Grid container px={1} rowGap={1}>
-                <Grid item xs={12} sm={6} md={8}>
-                  {/* Image */}
-                  <img
-                    width="100%"
-                    src={review.review_img_url}
-                    alt={review.title}
-                  />
-                </Grid>
-                {/* Text */}
-                <Grid item xs={12} sm={6} md={4} alignSelf="center">
-                  <Stack spacing={1} pl={{ sm: 3, md: 6 }}>
-                    <Typography>
-                      <strong>Designer:</strong> {review.designer}
-                    </Typography>
-                    <Typography>
-                      <strong>Review by:</strong> {review.owner}
-                    </Typography>
-                    <Typography sx={{ color: 'grey' }}>
-                      <em>{getDateStringFromTimestamp(review.created_at)}</em>
-                    </Typography>
-                  </Stack>
-                </Grid>
+            {/* Metadata */}
+            <Grid container px={1} rowGap={1}>
+              <Grid item xs={12} sm={6} md={8}>
+                {/* Image */}
+                <img
+                  width="100%"
+                  src={review.review_img_url}
+                  alt={review.title}
+                />
+              </Grid>
+              {/* Text */}
+              <Grid item xs={12} sm={6} md={4} alignSelf="center">
+                <Stack spacing={1} pl={{ sm: 3, md: 6 }}>
+                  <Typography>
+                    <strong>Designer:</strong> {review.designer}
+                  </Typography>
+                  <Typography>
+                    <strong>Review by:</strong> {review.owner}
+                  </Typography>
+                  <Typography sx={{ color: 'grey' }}>
+                    <em>{getDateStringFromTimestamp(review.created_at)}</em>
+                  </Typography>
+                </Stack>
               </Grid>
 
               {/* Review Article */}
-              <Typography px={1}>{review.review_body}</Typography>
+              <Grid item md={8}>
+                <Typography px={1}>{review.review_body}</Typography>
+              </Grid>
+            </Grid>
 
-              {/* Vote bar - upvote/downvote options */}
-            </Stack>
-          </Paper>
-        </Grid>
+            {/* Vote bar - upvote/downvote options */}
+          </Stack>
+        </ReviewSection>
+
+        {/* Comments section */}
+        <ReviewSection>
+          <ReviewComments comments={comments} />
+        </ReviewSection>
       </Grid>
     </PageWrapper>
   );
