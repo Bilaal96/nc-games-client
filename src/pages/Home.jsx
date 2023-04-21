@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import * as gamesApi from '../api';
 
 // Components
@@ -7,6 +7,7 @@ import PageWrapper from '../components/PageWrapper';
 import DisplayMessage from '../components/DisplayMessage';
 import PageSpinner from '../components/PageSpinner';
 import PreviewCard from '../components/PreviewCard';
+import { useEffect } from 'react';
 
 // 15 minutes in milliseconds
 const refetchInterval = 60 * 1000 * 15;
@@ -17,7 +18,11 @@ const Home = () => {
     isFetching,
     error,
     data: reviews,
-  } = useQuery('reviews', gamesApi.fetchAllReviews, { refetchInterval });
+  } = useQuery(['reviews'], gamesApi.fetchAllReviews, { refetchInterval });
+
+  useEffect(() => {
+    console.log({ reviews });
+  }, [reviews]);
 
   if (isFetching) {
     return (

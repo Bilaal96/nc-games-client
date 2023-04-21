@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import * as gamesApi from '../api';
 
@@ -12,6 +12,7 @@ import StyledChip from '../components/StyledChip';
 // Utils
 import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
 import ReviewComments from '../components/ReviewComments';
+import { useEffect } from 'react';
 
 const ReviewSection = ({ children }) => {
   return (
@@ -29,7 +30,10 @@ const Review = () => {
     isFetching: fetchingReview,
     error: errorReview,
     data: review,
-  } = useQuery(['review', review_id], gamesApi.fetchReviewById);
+  } = useQuery(['review', review_id], gamesApi.fetchReviewById, {
+    // refetchInterval: 15 * 60 * 1000,
+    refetchOnMount: false,
+  });
 
   // Dependent query - only executes if review was fetched successfully
   const {
@@ -39,6 +43,10 @@ const Review = () => {
   } = useQuery(['comments', review_id], gamesApi.fetchCommentsByReviewId, {
     enabled: !!review,
   });
+
+  useEffect(() => {
+    console.log({ review, comments });
+  }, [review, comments]);
 
   if (fetchingReview || fetchingComments) {
     return (

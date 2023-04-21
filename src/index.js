@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 // Contexts
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/Auth';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Components
 import CSSBaseline from '@mui/material/CssBaseline';
