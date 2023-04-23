@@ -12,7 +12,6 @@ import StyledChip from '../components/StyledChip';
 // Utils
 import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
 import ReviewComments from '../components/ReviewComments';
-import { useEffect } from 'react';
 
 const ReviewSection = ({ children }) => {
   return (
@@ -27,28 +26,21 @@ const ReviewSection = ({ children }) => {
 const Review = () => {
   const { review_id } = useParams();
   const {
-    isFetching: fetchingReview,
+    isLoading: loadingReview,
     error: errorReview,
     data: review,
-  } = useQuery(['review', review_id], gamesApi.fetchReviewById, {
-    // refetchInterval: 15 * 60 * 1000,
-    refetchOnMount: false,
-  });
+  } = useQuery(['review', review_id], gamesApi.fetchReviewById);
 
-  // Dependent query - only executes if review was fetched successfully
+  // Dependent query - only executes if enabled property evaluates to true - i.e. review was fetched successfully
   const {
-    isFetching: fetchingComments,
+    isLoading: loadingComments,
     error: errorComments,
     data: comments,
   } = useQuery(['comments', review_id], gamesApi.fetchCommentsByReviewId, {
     enabled: !!review,
   });
 
-  useEffect(() => {
-    console.log({ review, comments });
-  }, [review, comments]);
-
-  if (fetchingReview || fetchingComments) {
+  if (loadingReview || loadingComments) {
     return (
       <PageWrapper heading="Review">
         <PageSpinner />
