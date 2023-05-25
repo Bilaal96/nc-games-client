@@ -12,6 +12,7 @@ import StyledChip from '../components/StyledChip';
 // Utils
 import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
 import ReviewComments from '../components/ReviewComments';
+import ReviewInteractionsBar from '../components/ReviewInteractionsBar';
 
 const ReviewSection = ({ children }) => {
   return (
@@ -29,7 +30,7 @@ const Review = () => {
     isLoading: loadingReview,
     error: errorReview,
     data: review,
-  } = useQuery(['review', review_id], gamesApi.fetchReviewById);
+  } = useQuery(['reviews', review_id], gamesApi.fetchReviewById);
 
   // Dependent query - only executes if enabled property evaluates to true - i.e. review was fetched successfully
   const {
@@ -111,11 +112,17 @@ const Review = () => {
 
               {/* Review Article */}
               <Grid item md={8}>
-                <Typography px={1}>{review.review_body}</Typography>
+                <Typography>{review.review_body}</Typography>
+              </Grid>
+
+              {/* Interaction Bar - like & dislike */}
+              <Grid item xs={12} md={8}>
+                <ReviewInteractionsBar
+                  reviewId={review_id}
+                  votes={review.votes}
+                />
               </Grid>
             </Grid>
-
-            {/* Vote bar - upvote/downvote options */}
           </Stack>
         </ReviewSection>
 

@@ -19,3 +19,9 @@ export function fetchCommentsByReviewId({ queryKey }) {
     .get(`/reviews/${review_id}/comments`)
     .then(({ data }) => data.comments);
 }
+
+export function patchReviewVotes({ review_id, inc_votes }) {
+  return gamesApi
+    .patch(`/reviews/${review_id}`, { inc_votes })
+    .then(({ data }) => data.updatedReview);
+}
