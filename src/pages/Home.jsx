@@ -14,7 +14,7 @@ const Home = () => {
     isLoading,
     error,
     data: reviews,
-  } = useQuery(['reviews'], gamesApi.fetchAllReviews);
+  } = useQuery({ queryKey: ['reviews'], queryFn: gamesApi.fetchAllReviews });
 
   if (isLoading) {
     return (

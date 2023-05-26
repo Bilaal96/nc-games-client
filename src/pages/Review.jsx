@@ -12,6 +12,7 @@ import StyledChip from '../components/StyledChip';
 // Utils
 import getDateStringFromTimestamp from '../utils/get-date-string-from-timestamp';
 import ReviewComments from '../components/ReviewComments';
+import ReviewInteractionsBar from '../components/ReviewInteractionsBar';
 
 const ReviewSection = ({ children }) => {
   return (
@@ -29,16 +30,24 @@ const Review = () => {
     isLoading: loadingReview,
     error: errorReview,
     data: review,
-  } = useQuery(['review', review_id], gamesApi.fetchReviewById);
+  } = useQuery({
+    queryKey: ['reviews', review_id],
+    queryFn: gamesApi.fetchReviewById,
+  });
 
   // Dependent query - only executes if enabled property evaluates to true - i.e. review was fetched successfully
   const {
     isLoading: loadingComments,
     error: errorComments,
     data: comments,
-  } = useQuery(['comments', review_id], gamesApi.fetchCommentsByReviewId, {
-    enabled: !!review,
-  });
+  } = useQuery(
+    {
+      queryKey: ['comments', review_id],
+      queryFn: gamesApi.fetchCommentsByReviewId,
+    },
+    // Must successfully fetch reviews before comments can be fetched
+    { enabled: !!review }
+  );
 
   if (loadingReview || loadingComments) {
     return (
@@ -111,11 +120,14 @@ const Review = () => {
 
               {/* Review Article */}
               <Grid item md={8}>
-                <Typography px={1}>{review.review_body}</Typography>
+                <Typography>{review.review_body}</Typography>
+              </Grid>
+
+              {/* Interaction Bar - like & dislike */}
+              <Grid item xs={12} md={8}>
+                <ReviewInteractionsBar review={review} />
               </Grid>
             </Grid>
-
-            {/* Vote bar - upvote/downvote options */}
           </Stack>
         </ReviewSection>
 
