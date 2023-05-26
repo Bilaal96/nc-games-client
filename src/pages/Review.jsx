@@ -30,16 +30,24 @@ const Review = () => {
     isLoading: loadingReview,
     error: errorReview,
     data: review,
-  } = useQuery(['reviews', review_id], gamesApi.fetchReviewById);
+  } = useQuery({
+    queryKey: ['reviews', review_id],
+    queryFn: gamesApi.fetchReviewById,
+  });
 
   // Dependent query - only executes if enabled property evaluates to true - i.e. review was fetched successfully
   const {
     isLoading: loadingComments,
     error: errorComments,
     data: comments,
-  } = useQuery(['comments', review_id], gamesApi.fetchCommentsByReviewId, {
-    enabled: !!review,
-  });
+  } = useQuery(
+    {
+      queryKey: ['comments', review_id],
+      queryFn: gamesApi.fetchCommentsByReviewId,
+    },
+    // Must successfully fetch reviews before comments can be fetched
+    { enabled: !!review }
+  );
 
   if (loadingReview || loadingComments) {
     return (
@@ -117,10 +125,7 @@ const Review = () => {
 
               {/* Interaction Bar - like & dislike */}
               <Grid item xs={12} md={8}>
-                <ReviewInteractionsBar
-                  reviewId={review_id}
-                  votes={review.votes}
-                />
+                <ReviewInteractionsBar review={review} />
               </Grid>
             </Grid>
           </Stack>

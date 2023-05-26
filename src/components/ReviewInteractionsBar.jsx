@@ -9,7 +9,8 @@ import {
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as gamesApi from '../api';
 
-const ReviewInteractionsBar = ({ reviewId: review_id, votes }) => {
+const ReviewInteractionsBar = ({ review }) => {
+  const { review_id, votes } = review;
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
 
