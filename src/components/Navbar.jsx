@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+// Components
+import { NavLink } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -16,12 +18,11 @@ import {
   Typography,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
-import { NavLink } from 'react-router-dom';
 
 const drawerWidth = 240;
 const navItems = [
   { text: 'Reviews', path: '/reviews' },
-  { text: 'Switch Accounts', path: '/auth' },
+  { text: 'Switch Account', path: '/switch-account' },
 ];
 
 const Navbar = () => {
@@ -32,7 +33,10 @@ const Navbar = () => {
   };
 
   const drawerContent = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+    <Box
+      onClick={handleDrawerToggle}
+      sx={{ textAlign: 'center', height: '100vh' }}
+    >
       <Typography variant="h6" sx={{ my: 2 }}>
         Socialite
       </Typography>

@@ -1,15 +1,17 @@
+// Pages
+import Home from './pages/Home';
+import Review from './pages/Review';
+import SwitchAccounts from './pages/SwitchAccounts';
+
 // Components
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Container, Toolbar } from '@mui/material';
 import Navbar from './components/Navbar';
 
-// Pages
-import Home from './pages/Home';
-import Review from './pages/Review';
-
 function App() {
   return (
     <div className="App">
+      {/* Navbar is fixed to top, Toolbar offsets the Container (below) so that it appears below the Navbar correctly */}
       <Navbar />
       <Toolbar />
 
@@ -18,7 +20,7 @@ function App() {
           <Route path="/" element={<Navigate to="/reviews" replace={true} />} />
           <Route path="/reviews" element={<Home />} />
           <Route path="/reviews/:review_id" element={<Review />} />
-          <Route path="/auth" element={<h1>Auth</h1>} />
+          <Route path="/switch-account" element={<SwitchAccounts />} />
         </Routes>
       </Container>
     </div>
