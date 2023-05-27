@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useSnackbar } from 'notistack';
 
 // Contexts
 import { useContext } from 'react';
@@ -15,6 +16,7 @@ import * as gamesApi from '../api';
 
 const SwitchAccounts = () => {
   const auth = useContext(AuthContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   const {
     isLoading,
@@ -22,6 +24,16 @@ const SwitchAccounts = () => {
     data: users,
   } = useQuery({ queryKey: ['users'], queryFn: gamesApi.fetchAllUsers });
   console.log(users);
+
+  const handleUserCardClick = (user) => {
+    // Log user in
+    auth.login(user);
+    // Display Snackbar to notify user of login
+    enqueueSnackbar(`Logged in as ${user.username}`, {
+      variant: 'success',
+      anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
+    });
+  };
 
   if (isLoading) {
     return (
@@ -69,7 +81,7 @@ const SwitchAccounts = () => {
         {users.map((user, index) => (
           <Grid key={index} item xs={12} sm={6}>
             <Card
-              onClick={() => auth.login(user)}
+              onClick={() => handleUserCardClick(user)}
               sx={{
                 p: { xs: 1, sm: 2 },
                 ':hover': {
