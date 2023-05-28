@@ -43,7 +43,7 @@ const Review = () => {
   } = useQuery(
     {
       queryKey: ['reviews', review_id, 'comments'],
-      queryFn: gamesApi.fetchCommentsByReviewId,
+      queryFn: gamesApi.fetchAllReviewComments,
     },
     // Must successfully fetch reviews before comments can be fetched
     { enabled: !!review }

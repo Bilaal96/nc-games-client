@@ -23,7 +23,7 @@ export function patchReviewVotes({ review_id, inc_votes }) {
     .then(({ data }) => data.updatedReview);
 }
 
-export function fetchCommentsByReviewId({ queryKey }) {
+export function fetchAllReviewComments({ queryKey }) {
   const review_id = queryKey[1];
   return gamesApi
     .get(`/reviews/${review_id}/comments`)
