@@ -42,7 +42,7 @@ const Review = () => {
     data: comments,
   } = useQuery(
     {
-      queryKey: ['comments', review_id],
+      queryKey: ['reviews', review_id, 'comments'],
       queryFn: gamesApi.fetchCommentsByReviewId,
     },
     // Must successfully fetch reviews before comments can be fetched
@@ -133,7 +133,7 @@ const Review = () => {
 
         {/* Comments section */}
         <ReviewSection>
-          <ReviewComments comments={comments} />
+          <ReviewComments reviewId={review_id} comments={comments} />
         </ReviewSection>
       </Grid>
     </PageWrapper>

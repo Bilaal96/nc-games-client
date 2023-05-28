@@ -1,7 +1,9 @@
+// Components
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import ReviewCommentForm from './ReviewCommentForm';
 import DisplayMessage from './DisplayMessage';
 
-const ReviewComments = ({ comments }) => {
+const ReviewComments = ({ reviewId: review_id, comments }) => {
   return (
     <Stack spacing={2}>
       <Typography
@@ -12,6 +14,9 @@ const ReviewComments = ({ comments }) => {
         Comments
       </Typography>
 
+      <ReviewCommentForm reviewId={review_id} />
+
+      {/* Comments list */}
       <Stack divider={<Divider sx={{ my: 2 }} />}>
         {comments.length ? (
           comments.map((comment) => (

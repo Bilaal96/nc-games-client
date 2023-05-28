@@ -17,6 +17,12 @@ export function fetchReviewById({ queryKey }) {
   return gamesApi.get(`/reviews/${review_id}`).then(({ data }) => data.review);
 }
 
+export function patchReviewVotes({ review_id, inc_votes }) {
+  return gamesApi
+    .patch(`/reviews/${review_id}`, { inc_votes })
+    .then(({ data }) => data.updatedReview);
+}
+
 export function fetchCommentsByReviewId({ queryKey }) {
   const review_id = queryKey[1];
   return gamesApi
@@ -24,8 +30,8 @@ export function fetchCommentsByReviewId({ queryKey }) {
     .then(({ data }) => data.comments);
 }
 
-export function patchReviewVotes({ review_id, inc_votes }) {
+export function postReviewComment({ review_id, newComment }) {
   return gamesApi
-    .patch(`/reviews/${review_id}`, { inc_votes })
-    .then(({ data }) => data.updatedReview);
+    .post(`/reviews/${review_id}/comments`, newComment)
+    .then(({ data }) => data.createdComment);
 }
