@@ -8,8 +8,16 @@ export function fetchAllUsers() {
   return gamesApi.get('/users').then(({ data }) => data.users);
 }
 
-export function fetchAllReviews() {
-  return gamesApi.get('/reviews').then(({ data }) => data.reviews);
+export function fetchAllReviews(queryString) {
+  // TODO validate query string on client side - prevents unnecessary request
+  const requestUrl = queryString ? `/reviews?${queryString}` : 'reviews';
+  console.log({ requestUrl });
+
+  return gamesApi.get(requestUrl).then(({ data }) => data.reviews);
+}
+
+export function fetchReviewCategories() {
+  return gamesApi.get('/categories').then(({ data }) => data.categories);
 }
 
 export function fetchReviewById({ queryKey }) {
