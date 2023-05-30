@@ -35,3 +35,7 @@ export function postReviewComment({ review_id, newComment }) {
     .post(`/reviews/${review_id}/comments`, newComment)
     .then(({ data }) => data.createdComment);
 }
+
+export function deleteReviewComment({ comment_id }) {
+  return gamesApi.delete(`/comments/${comment_id}`);
+}
