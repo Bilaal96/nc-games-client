@@ -12,7 +12,7 @@ import {
  * A modal used to confirm or cancel user actions
  * The open state and corresponding state setter function should be defined in a parent component, then passed to ConfirmationDialog as props
  */
-export default function ConfirmationDialog({
+const ConfirmationDialog = ({
   title, // optional
   content,
   open,
@@ -22,7 +22,7 @@ export default function ConfirmationDialog({
   // If not manually passed as a prop, `actions` defaults to an empty object
   // This is so that we can destructure default properties, as below
   actions = {},
-}) {
+}) => {
   const { cancelText = 'Cancel', confirmText = 'Confirm' } = actions;
 
   const handleConfirm = () => {
@@ -66,4 +66,6 @@ export default function ConfirmationDialog({
       </DialogActions>
     </Dialog>
   );
-}
+};
+
+export default ConfirmationDialog;

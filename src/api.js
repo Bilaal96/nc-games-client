@@ -8,12 +8,12 @@ export function fetchAllUsers() {
   return gamesApi.get('/users').then(({ data }) => data.users);
 }
 
-export function fetchAllReviews(queryString) {
-  // TODO validate query string on client side - prevents unnecessary request
-  const requestUrl = queryString ? `/reviews?${queryString}` : 'reviews';
-  console.log({ requestUrl });
+export function fetchAllReviews(searchParams) {
+  // TODO validate searchParams on client side - prevents unnecessary request
 
-  return gamesApi.get(requestUrl).then(({ data }) => data.reviews);
+  return gamesApi
+    .get('/reviews', { params: searchParams })
+    .then(({ data }) => data.reviews);
 }
 
 export function fetchReviewCategories() {

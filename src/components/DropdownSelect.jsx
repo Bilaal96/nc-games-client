@@ -13,7 +13,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
  * @param { any } value - the selected value of the Select component. This should be a state value passed from a parent component.
  * @param { Function } onChange - handles change event for the Select component - i.e. executes logic on selection of a MenuItem.
  */
-function DropdownSelect({
+const DropdownSelect = ({
   id,
   label,
   menuItems,
@@ -21,7 +21,7 @@ function DropdownSelect({
   value,
   onChange: handleChange,
   ...otherSelectProps
-}) {
+}) => {
   const labelId = `${id}-label`;
 
   return (
@@ -55,6 +55,6 @@ function DropdownSelect({
       </FormControl>
     </Box>
   );
-}
+};
 
 export default DropdownSelect;

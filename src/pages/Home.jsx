@@ -34,7 +34,7 @@ const Home = () => {
     refetch: refetchReviews,
   } = useQuery({
     queryKey: ['reviews', Object.fromEntries(searchParams)],
-    queryFn: () => gamesApi.fetchAllReviews(searchParams.toString()),
+    queryFn: () => gamesApi.fetchAllReviews(searchParams),
   });
 
   // Fetch review categories
