@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import * as gamesApi from '../api';
 
 // Components
 import { Grid, Stack } from '@mui/material';
@@ -11,22 +9,28 @@ import PageSpinner from '../components/PageSpinner';
 import PreviewCard from '../components/PreviewCard';
 import DropdownSelect from '../components/DropdownSelect';
 
+// Utils
+import * as gamesApi from '../api';
+import getValueFromSearchParams from '../utils/get-value-from-search-params';
+
 // Render Previews of Reviews
 const Home = () => {
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   console.log({ searchParams: searchParams.toString() || 'none' });
 
-  const getCategoryFromSearchParams = useCallback(() => {
-    return searchParams.has('category') ? searchParams.get('category') : '';
-  }, [searchParams]);
+  // Fetch review categories
+  const { isLoading: isLoadingCategories, data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: gamesApi.fetchReviewCategories,
+    select: (categories) => ({
+      // An array of objects; each object contains a `slug` & `description` property
+      meta: categories,
+      // Generate the options of the DropdownSelect responsible for filtering reviews by category
+      filters: categories.map((category) => ({ value: category.slug })),
+    }),
+  });
 
-  const [categoryFilters, setCategoryFilters] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(
-    getCategoryFromSearchParams
-  );
-
-  // Fetch Reviews; use query/search parameters if available
+  // Fetch Reviews; uses searchParams if applied
   const {
     isLoading: isLoadingReviews,
     error,
@@ -37,44 +41,19 @@ const Home = () => {
     queryFn: () => gamesApi.fetchAllReviews(searchParams),
   });
 
-  // Fetch review categories
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: gamesApi.fetchReviewCategories,
-  });
-
-  // Generate categoryFilters using the fetched categories
-  // DropdownSelect's `menuItems` prop is an array of objects
-  // Each object must contain a `value` property
-  useEffect(() => {
-    if (categories) {
-      setCategoryFilters(
-        categories.map((category) => ({ value: category.slug }))
-      );
-    }
-  }, [categories]);
-
-  // Update selectedCategory on browser navigation
-  useEffect(() => {
-    setSelectedCategory(getCategoryFromSearchParams);
-  }, [location, getCategoryFromSearchParams]);
-
-  const handleCategorySelect = (event) => {
+  const handleSelectChange = (event, key) => {
     const selectedValue = event.target.value;
-
-    // Update select input
-    setSelectedCategory(selectedValue);
 
     // Update search params shown in browser url
     const newSearchParams = {
       ...Object.fromEntries(searchParams),
-      category: selectedValue,
+      [key]: selectedValue,
     };
 
     if (selectedValue) {
       setSearchParams(newSearchParams);
     } else {
-      delete newSearchParams.category;
+      delete newSearchParams[key];
       setSearchParams(newSearchParams);
     }
 
@@ -82,7 +61,29 @@ const Home = () => {
     refetchReviews();
   };
 
-  if (isLoadingReviews) {
+  // Reusable instance of DropdownSelect
+  const FilterReviewsSelect = ({ inputName, menuItems, error, ...rest }) => {
+    const label = inputName[0].toUpperCase() + inputName.slice(1);
+
+    return (
+      <DropdownSelect
+        id={`select-${inputName}`}
+        label={label}
+        menuItems={menuItems}
+        onChange={(event) => handleSelectChange(event, inputName)}
+        initialState={() => getValueFromSearchParams(inputName)}
+        // Update Select value on browser navigation
+        locationDependent
+        noSelectionText="No filter"
+        // Instance specific props
+        error={error}
+        {...rest}
+      />
+    );
+  };
+
+  // Loading UI
+  if (isLoadingCategories || isLoadingReviews) {
     return (
       <PageWrapper heading="Reviews">
         <PageSpinner />
@@ -90,7 +91,36 @@ const Home = () => {
     );
   }
 
+  // Error UI
   if (error) {
+    // 404: Error occurred due to invalid searchParams value
+    if (error.message === 'invalid review filter') {
+      return (
+        <PageWrapper heading="Reviews">
+          {/* Render Select's with error state where appropriate */}
+          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+            {/* Filter by category */}
+            {categories?.filters && (
+              <FilterReviewsSelect
+                inputName="category"
+                menuItems={categories.filters}
+                error={error.category}
+              />
+            )}
+          </Stack>
+
+          {/* Render error message */}
+          <DisplayMessage
+            error={
+              'Invalid filter(s) applied. Try again by changing the highlighted filter(s).'
+            }
+            message="Something went wrong whilst fetching the reviews. Please try again with different filters."
+          />
+        </PageWrapper>
+      );
+    }
+
+    // Generic error UI for any other errors
     return (
       <PageWrapper heading="Reviews">
         <DisplayMessage
@@ -101,19 +131,16 @@ const Home = () => {
     );
   }
 
+  // UI with reviews
   return (
     <PageWrapper heading="Reviews">
       {/* Filters */}
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         {/* Filter by category */}
-        {categoryFilters.length && (
-          <DropdownSelect
-            id="select-category"
-            label="Category"
-            noSelectionText="Clear filter"
-            menuItems={categoryFilters}
-            value={selectedCategory}
-            onChange={handleCategorySelect}
+        {categories?.filters && (
+          <FilterReviewsSelect
+            inputName="category"
+            menuItems={categories.filters}
           />
         )}
       </Stack>
