@@ -2,24 +2,28 @@ import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 // Components
-import { Grid, Stack } from '@mui/material';
+import { Grid } from '@mui/material';
 import PageWrapper from '../components/PageWrapper';
 import DisplayMessage from '../components/DisplayMessage';
 import PageSpinner from '../components/PageSpinner';
 import PreviewCard from '../components/PreviewCard';
-import DropdownSelect from '../components/DropdownSelect';
+import ReviewFilters from '../components/ReviewFilters';
 
 // Utils
 import * as gamesApi from '../api';
-import getValueFromSearchParams from '../utils/get-value-from-search-params';
+import {
+  categoryFilterOptions,
+  sortByFilterOptions,
+  orderFilterOptions,
+} from '../utils/review-filter-options';
 
 // Render Previews of Reviews
 const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log({ searchParams: searchParams.toString() || 'none' });
 
   // Fetch review categories
   const { isLoading: isLoadingCategories, data: categories } = useQuery({
+    // placeholderData: { meta: [], filters: [] },
     queryKey: ['categories'],
     queryFn: gamesApi.fetchReviewCategories,
     select: (categories) => ({
@@ -30,7 +34,7 @@ const Home = () => {
     }),
   });
 
-  // Fetch Reviews; uses searchParams if applied
+  // Fetch Reviews; uses searchParams if they exist
   const {
     isLoading: isLoadingReviews,
     error,
@@ -61,27 +65,6 @@ const Home = () => {
     refetchReviews();
   };
 
-  // Reusable instance of DropdownSelect
-  const FilterReviewsSelect = ({ inputName, menuItems, error, ...rest }) => {
-    const label = inputName[0].toUpperCase() + inputName.slice(1);
-
-    return (
-      <DropdownSelect
-        id={`select-${inputName}`}
-        label={label}
-        menuItems={menuItems}
-        onChange={(event) => handleSelectChange(event, inputName)}
-        initialState={() => getValueFromSearchParams(inputName)}
-        // Update Select value on browser navigation
-        locationDependent
-        noSelectionText="No filter"
-        // Instance specific props
-        error={error}
-        {...rest}
-      />
-    );
-  };
-
   // Loading UI
   if (isLoadingCategories || isLoadingReviews) {
     return (
@@ -91,23 +74,30 @@ const Home = () => {
     );
   }
 
+  /**
+   * In ReviewFilters, each entry in selectOptions Map renders a FilterReviewsSelect
+   * Map values are arrays of elements formatted like so: { value: ... }
+   * Map is preferred over object as it preserves order of entries
+   */
+  const selectOptions = new Map([
+    ['category', categories?.filters || categoryFilterOptions],
+    ['sort_by', sortByFilterOptions],
+    ['order', orderFilterOptions],
+  ]);
+
+  const reviewFiltersProps = {
+    onChange: handleSelectChange,
+    selectOptions,
+  };
+
   // Error UI
   if (error) {
     // 404: Error occurred due to invalid searchParams value
     if (error.message === 'invalid review filter') {
       return (
         <PageWrapper heading="Reviews">
-          {/* Render Select's with error state where appropriate */}
-          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-            {/* Filter by category */}
-            {categories?.filters && (
-              <FilterReviewsSelect
-                inputName="category"
-                menuItems={categories.filters}
-                error={error.category}
-              />
-            )}
-          </Stack>
+          {/* Renders Select inputs (used to filter reviews) with error state when appropriate */}
+          <ReviewFilters error={error} {...reviewFiltersProps} />
 
           {/* Render error message */}
           <DisplayMessage
@@ -134,16 +124,8 @@ const Home = () => {
   // UI with reviews
   return (
     <PageWrapper heading="Reviews">
-      {/* Filters */}
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        {/* Filter by category */}
-        {categories?.filters && (
-          <FilterReviewsSelect
-            inputName="category"
-            menuItems={categories.filters}
-          />
-        )}
-      </Stack>
+      {/* Renders Select inputs (used to filter reviews) */}
+      <ReviewFilters {...reviewFiltersProps} />
 
       {/* Preview Cards */}
       {reviews.length ? (

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { validReviewFilters } from './utils/review-filter-options';
 
 const gamesApi = axios.create({
   baseURL: 'https://nc-games-api-9f6b.onrender.com/api',
@@ -8,42 +9,23 @@ export function fetchAllUsers() {
   return gamesApi.get('/users').then(({ data }) => data.users);
 }
 
+/**
+ * If no explicit 'category' query is specified, backend will fetch reviews from all categories
+
+ * If no explicit 'sort_by' query is specified, backend defaults to 'created_at'
+ 
+ * If 'sort_by' query is explicitly set, 'order' defaults to 'asc'
+ * Otherwise, backend defaults to 'sort_by=created_at' & 'order=desc'
+ * Explicitly specifying 'order' will override the defaults 
+ */
 export function fetchAllReviews(searchParams) {
   // Validate searchParams to prevent requests that will definitely fail
   // Returned error states can be used to give feedback to user
   if (searchParams) {
-    const validFilters = {
-      category: [
-        'strategy',
-        'hidden-roles',
-        'dexterity',
-        'push-your-luck',
-        'roll-and-write',
-        'deck-building',
-        'engine-building',
-        // If no explicit 'category' query is specified, backend will fetch reviews from all categories
-        '',
-      ],
-      sort_by: [
-        'title', // game title
-        'category',
-        'votes', // review votes
-        'designer', // game designer
-        'owner', // author of review
-        'created_at',
-        // If no explicit 'sort_by' query is specified, backend defaults to 'created_at'
-        '',
-      ],
-      // If 'sort_by' query is explicitly set, 'order' defaults to 'asc'
-      // Otherwise, backend defaults to 'sort_by=created_at' & 'order=desc'
-      // Explicitly specifying 'order' will override the defaults
-      order: ['asc', 'desc', ''],
-    };
-
     const hasInvalidParamValue = (key) => {
       return (
         searchParams.has(key) &&
-        !validFilters[key].includes(searchParams.get(key))
+        !validReviewFilters[key].includes(searchParams.get(key))
       );
     };
 
@@ -59,7 +41,7 @@ export function fetchAllReviews(searchParams) {
     }
   }
 
-  // No errors, make request
+  // No errors, make request with searchParams (if any)
   return gamesApi
     .get('/reviews', { params: searchParams })
     .then(({ data }) => data.reviews);
