@@ -21,7 +21,8 @@ import { Menu as MenuIcon } from '@mui/icons-material';
 
 const drawerWidth = 240;
 const navItems = [
-  { text: 'Reviews', path: '/reviews' },
+  // Query parameters are applied to set default values for corresponding review filters
+  { text: 'Reviews', path: '/reviews?sort_by=created_at&order=desc' },
   { text: 'Switch Account', path: '/switch-account' },
 ];
 
