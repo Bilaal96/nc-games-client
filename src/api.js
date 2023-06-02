@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { validReviewFilters } from './utils/review-filter-options';
 
 const gamesApi = axios.create({
   baseURL: 'https://nc-games-api-9f6b.onrender.com/api',
@@ -8,8 +9,46 @@ export function fetchAllUsers() {
   return gamesApi.get('/users').then(({ data }) => data.users);
 }
 
-export function fetchAllReviews() {
-  return gamesApi.get('/reviews').then(({ data }) => data.reviews);
+/**
+ * If no explicit 'category' query is specified, backend will fetch reviews from all categories
+
+ * If no explicit 'sort_by' query is specified, backend defaults to 'created_at'
+ 
+ * If 'sort_by' query is explicitly set, 'order' defaults to 'asc'
+ * Otherwise, backend defaults to 'sort_by=created_at' & 'order=desc'
+ * Explicitly specifying 'order' will override the defaults 
+ */
+export function fetchAllReviews(searchParams) {
+  // Validate searchParams to prevent requests that will definitely fail
+  // Returned error states can be used to give feedback to user
+  if (searchParams) {
+    const hasInvalidParamValue = (key) => {
+      return (
+        searchParams.has(key) &&
+        !validReviewFilters[key].includes(searchParams.get(key))
+      );
+    };
+
+    let errors = { category: false, sort_by: false, order: false };
+
+    if (hasInvalidParamValue('category')) errors.category = true;
+    if (hasInvalidParamValue('sort_by')) errors.sort_by = true;
+    if (hasInvalidParamValue('order')) errors.order = true;
+
+    // If any errors, reject
+    if (Object.values(errors).includes(true)) {
+      return Promise.reject({ message: 'invalid review filter', ...errors });
+    }
+  }
+
+  // No errors, make request with searchParams (if any)
+  return gamesApi
+    .get('/reviews', { params: searchParams })
+    .then(({ data }) => data.reviews);
+}
+
+export function fetchReviewCategories() {
+  return gamesApi.get('/categories').then(({ data }) => data.categories);
 }
 
 export function fetchReviewById({ queryKey }) {
