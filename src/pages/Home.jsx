@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 // Components
@@ -20,17 +20,16 @@ import {
 
 // Render Previews of Reviews
 const Home = () => {
-  const hasDefaultSearchParams = useRef(false);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // When mounting this component, set default searchParams for sort_by & order
+  // When mounting this component, if there are no searchParams, set default values for sort_by & order
   useEffect(() => {
-    console.log('set default searchParams');
-    if (!hasDefaultSearchParams.current) {
-      hasDefaultSearchParams.current = true;
+    const searchParamsArray = Array.from(searchParams);
+    if (searchParamsArray.length === 0) {
       setSearchParams({ sort_by: 'created_at', order: 'desc' });
     }
-  }, [setSearchParams]);
+  }, [location, searchParams, setSearchParams]);
 
   // Fetch review categories
   const { isLoading: isLoadingCategories, data: categories } = useQuery({
@@ -164,7 +163,7 @@ const Home = () => {
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         <ReviewFiltersSelect {...categoryFilterProps} />
         <ReviewFiltersSelect {...sortByFilterProps} />
-        <ReviewFiltersSelect {...orderFilterProps} defaultValue="" />
+        <ReviewFiltersSelect {...orderFilterProps} />
       </Stack>
 
       {/* Preview Cards */}
