@@ -2,9 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 // Contexts
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider, createTheme } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/Auth';
 
 // Components
@@ -38,19 +39,29 @@ const queryClient = new QueryClient({
   },
 });
 
+const theme = createTheme({});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <SnackbarProvider maxSnack={1} autoHideDuration={3000} preventDuplicate>
-          <AuthProvider>
-            <CSSBaseline />
-            <App />
-            {process.env?.NODE_ENV === 'development' && <ReactQueryDevtools />}
-          </AuthProvider>
-        </SnackbarProvider>
-      </BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <SnackbarProvider
+            maxSnack={1}
+            autoHideDuration={3000}
+            preventDuplicate
+          >
+            <AuthProvider>
+              <CSSBaseline />
+              <App />
+              {process.env?.NODE_ENV === 'development' && (
+                <ReactQueryDevtools />
+              )}
+            </AuthProvider>
+          </SnackbarProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

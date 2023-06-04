@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTheme } from '@emotion/react';
+import { useMediaQuery } from '@mui/material';
 
 // Components
 import { Grid, Stack } from '@mui/material';
@@ -18,8 +20,17 @@ import {
   orderFilterOptions,
 } from '../utils/review-filter-options';
 
+// CSS media query breakpoint value in px
+const stackFiltersBreakpoint = 427;
+
 // Render Previews of Reviews
 const Home = () => {
+  const theme = useTheme();
+  // Returns true if screen width < stackFiltersBreakpoint, false otherwise
+  const shouldStackFilters = useMediaQuery(
+    theme.breakpoints.down(stackFiltersBreakpoint)
+  );
+
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -100,8 +111,10 @@ const Home = () => {
     searchParamKey: 'category',
     noSelectionText: 'all',
     options: categories?.filters || categoryFilterOptions,
-    // Push siblings to the right
-    BoxProps: { sx: { mr: 'auto' } },
+    BoxProps: {
+      // From breakpoint value & upwards, push siblings to the right
+      sx: { [theme.breakpoints.up(stackFiltersBreakpoint)]: { mr: 'auto' } },
+    },
   };
 
   const sortByFilterProps = {
@@ -125,7 +138,11 @@ const Home = () => {
       return (
         <PageWrapper heading="Reviews">
           {/* Renders Select inputs (used to filter reviews) with error state when appropriate */}
-          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          <Stack
+            direction={shouldStackFilters ? 'column' : 'row'}
+            spacing={2}
+            sx={{ mb: 2 }}
+          >
             <ReviewFiltersSelect
               {...categoryFilterProps}
               error={error.category}
@@ -160,7 +177,11 @@ const Home = () => {
   return (
     <PageWrapper heading="Reviews">
       {/* Renders Select inputs (used to filter reviews) */}
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+      <Stack
+        direction={shouldStackFilters ? 'column' : 'row'}
+        spacing={2}
+        sx={{ mb: 2 }}
+      >
         <ReviewFiltersSelect {...categoryFilterProps} />
         <ReviewFiltersSelect {...sortByFilterProps} />
         <ReviewFiltersSelect {...orderFilterProps} />
